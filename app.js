@@ -304,6 +304,16 @@ const SHOP_KEY = 'fittracker_compras_v1';
 let shopChecked = JSON.parse(localStorage.getItem(SHOP_KEY)||'{}');
 function saveShop(){localStorage.setItem(SHOP_KEY,JSON.stringify(shopChecked));}
 
+const shopCatImages = {
+  proteinas: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=900&h=260&fit=crop&q=80',
+  carbos: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=900&h=260&fit=crop&q=80',
+  lacteos: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=900&h=260&fit=crop&q=80',
+  verduras: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=900&h=260&fit=crop&q=80',
+  frutas: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=900&h=260&fit=crop&q=80',
+  grasas: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=900&h=260&fit=crop&q=80',
+  extras: 'https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=900&h=260&fit=crop&q=80'
+};
+
 const shopCats = [
   {
     id:'proteinas', label:'Proteínas', icon:'🥩', color:'var(--red)',
@@ -409,11 +419,16 @@ function renderShopItems(){
   const cats = activeShopCat==='todas' ? shopCats : shopCats.filter(c=>c.id===activeShopCat);
   let html='';
   cats.forEach(cat=>{
-    html+=`<div style="margin-bottom:24px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <span style="font-size:20px">${cat.icon}</span>
-        <span style="font-family:var(--font-head);font-size:17px;font-weight:700;letter-spacing:-0.01em">${cat.label}</span>
-        <span style="font-size:11px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);padding:2px 9px;border-radius:20px">${cat.items.filter(i=>shopChecked[i.id]).length}/${cat.items.length}</span>
+    const img = shopCatImages[cat.id] || '';
+    html+=`<div style="margin-bottom:28px">
+      <div class="cat-header" style="background-image:linear-gradient(180deg, rgba(10,12,18,0.4) 0%, rgba(10,12,18,0.92) 100%), url('${img}')">
+        <div class="cat-header-inner">
+          <span class="cat-header-emoji">${cat.icon}</span>
+          <div>
+            <div class="cat-header-title">${cat.label}</div>
+            <div class="cat-header-meta"><span class="cat-header-count">${cat.items.filter(i=>shopChecked[i.id]).length} de ${cat.items.length} comprados</span></div>
+          </div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px">`;
     cat.items.forEach(item=>{
