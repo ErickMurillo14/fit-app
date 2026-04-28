@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitTracker — Mi Programa Completo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">💪</div>
+    <div class="brand-name">FitTracker</div>
+    <div class="brand-sub">Programa 12 semanas</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Seguimiento</div>
+    <a class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+    <a class="nav-item" onclick="showPage('peso',this)"><span class="nav-icon">⚖️</span><span>Peso</span></a>
+    <a class="nav-item" onclick="showPage('medidas',this)"><span class="nav-icon">📏</span><span>Medidas</span></a>
+    <a class="nav-item" onclick="showPage('ejercicio',this)"><span class="nav-icon">🗓️</span><span>Log Ejercicio</span></a>
+    <a class="nav-item" onclick="showPage('nutricion',this)"><span class="nav-icon">🥗</span><span>Nutrición</span></a>
+    <div class="nav-group-label">Mi Programa</div>
+    <a class="nav-item" onclick="showPage('rutina',this)"><span class="nav-icon">🏋️</span><span>Rutina & Ejercicios</span></a>
+    <a class="nav-item" onclick="showPage('plan_comida',this)"><span class="nav-icon">🍽️</span><span>Plan de Comida</span></a>
+    <a class="nav-item" onclick="showPage('recetas',this)"><span class="nav-icon">👨‍🍳</span><span>Recetas & Cocina</span></a>
+    <div class="nav-group-label">Compras</div>
+    <a class="nav-item" onclick="showPage('compras',this)"><span class="nav-icon">🛒</span><span>Lista de Compras</span></a>
+    <div class="nav-group-label">Logros</div>
+    <a class="nav-item" onclick="showPage('logros',this)"><span class="nav-icon">🏅</span><span>Logros & Hitos</span></a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="profile-avatar">YO</div>
+    <div><div class="profile-name">Mi Perfil</div><div class="profile-stats">120 kg → 80 kg</div></div>
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main">
+<div class="topbar">
+  <div><div class="topbar-title" id="page-title">Dashboard</div><div class="topbar-date" id="page-date"></div></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" onclick="showPage('rutina',null)">Ver Rutina</button>
+    <button class="btn btn-primary" onclick="openModal('rapido')">+ Registro Rápido</button>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD ─── -->
+<div id="page-dashboard" class="page active">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-accent-line" style="background:var(--accent)"></div>
+      <div class="stat-label">Peso actual</div>
+      <div class="stat-value" id="d-peso">120.0 <span style="font-size:15px;color:var(--muted)">kg</span></div>
+      <div class="stat-sub">Inicio: 120.0 kg</div>
+      <div class="stat-badge badge-blue" id="d-perdido">Sin cambios aún</div>
+    </div>
+    <div class="stat-card"><div class="stat-accent-line" style="background:var(--amber)"></div>
+      <div class="stat-label">IMC actual</div>
+      <div class="stat-value" id="d-bmi">37.0 <span style="font-size:15px;color:var(--muted)">IMC</span></div>
+      <div class="stat-sub" id="d-bmi-cat">Obesidad grado II+</div>
+      <div class="stat-badge badge-amber">Meta: 24.7</div>
+    </div>
+    <div class="stat-card"><div class="stat-accent-line" style="background:var(--blue)"></div>
+      <div class="stat-label">Meta de peso</div>
+      <div class="stat-value">80 <span style="font-size:15px;color:var(--muted)">kg</span></div>
+      <div class="stat-sub" id="d-faltan">Faltan 40.0 kg</div>
+      <div class="stat-badge badge-purple" id="d-pct">0% completado</div>
+    </div>
+    <div class="stat-card"><div class="stat-accent-line" style="background:var(--purple)"></div>
+      <div class="stat-label">Sesiones totales</div>
+      <div class="stat-value" id="d-dias">0</div>
+      <div class="stat-sub">Entrenamientos registrados</div>
+      <div class="stat-badge badge-green" id="d-racha">🔥 Comenzando</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">Progreso general</div>
+      <div class="progress-wrap"><div class="progress-meta"><span class="progress-label">Pérdida de peso</span><span class="progress-val" id="pp-peso">0/40 kg</span></div><div class="progress-track"><div class="progress-fill" id="pp-peso-bar" style="width:0%;background:var(--accent)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-meta"><span class="progress-label">Hitos alcanzados</span><span class="progress-val" id="pp-hitos">0/8</span></div><div class="progress-track"><div class="progress-fill" id="pp-hitos-bar" style="width:0%;background:var(--blue)"></div></div></div>
+      <div class="progress-wrap"><div class="progress-meta"><span class="progress-label">Entrenamientos esta semana</span><span class="progress-val" id="pp-ex">0/5</span></div><div class="progress-track"><div class="progress-fill" id="pp-ex-bar" style="width:0%;background:var(--purple)"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">IMC — Índice de masa corporal</div>
+      <div style="text-align:center;padding:6px 0">
+        <div class="bmi-number" id="bmi-big" style="color:var(--amber)">37.0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px" id="bmi-cat-txt">Obesidad grado II+ — Meta: 24.7 (Normal)</div>
+        <div class="bmi-bar"><div class="bmi-marker" id="bmi-marker" style="left:72%"></div></div>
+        <div class="bmi-scale"><span>16</span><span>Bajo</span><span>Normal</span><span>Sobrepeso</span><span>Obeso</span><span>40</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Curva de peso</div>
+    <div class="chart-wrap"><canvas id="chart-dash"></canvas></div>
+    <div id="dash-empty" class="empty" style="display:none"><div class="empty-icon">📈</div><div class="empty-text">Registra tu primer pesaje para ver la gráfica</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title">Últimos registros</div><div id="d-ultimos"><div class="empty"><div class="empty-icon">⚖️</div><div class="empty-text">Sin registros aún</div></div></div></div>
+    <div class="card"><div class="card-title">Próximos hitos</div><div id="d-hitos"></div></div>
+  </div>
+</div>
+
+<!-- ─── PESO ─── -->
+<div id="page-peso" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Registrar pesaje</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" type="number" id="inp-peso" step="0.1" placeholder="119.5"></div>
+      <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="inp-fecha-peso"></div>
+      <div class="form-group"><label class="form-label">Momento</label><select class="form-input" id="inp-momento"><option>Mañana (en ayunas)</option><option>Mediodía</option><option>Noche</option></select></div>
+    </div>
+    <div class="form-group" style="margin-top:10px"><label class="form-label">Nota</label><input class="form-input" type="text" id="inp-nota-peso" placeholder="ej. después del gym..."></div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="guardarPeso()">Guardar pesaje</button></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Evolución del peso <span id="peso-tend" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
+    <div class="chart-wrap"><canvas id="chart-peso"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Historial completo</div>
+    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Peso</th><th>Cambio</th><th>IMC</th><th>Momento</th><th>Nota</th><th></th></tr></thead><tbody id="tabla-peso"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">Sin registros</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<!-- ─── MEDIDAS ─── -->
+<div id="page-medidas" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Registrar medidas</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="inp-fecha-med"></div>
+      <div class="form-group"><label class="form-label">Cintura (cm)</label><input class="form-input" type="number" id="inp-cintura" step="0.5" placeholder="105"></div>
+      <div class="form-group"><label class="form-label">Cadera (cm)</label><input class="form-input" type="number" id="inp-cadera" step="0.5" placeholder="115"></div>
+      <div class="form-group"><label class="form-label">Pecho (cm)</label><input class="form-input" type="number" id="inp-pecho" step="0.5" placeholder="110"></div>
+      <div class="form-group"><label class="form-label">Brazo D. (cm)</label><input class="form-input" type="number" id="inp-brazo" step="0.5" placeholder="38"></div>
+      <div class="form-group"><label class="form-label">Muslo D. (cm)</label><input class="form-input" type="number" id="inp-muslo" step="0.5" placeholder="65"></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="guardarMedidas()">Guardar medidas</button></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="card-title">Evolución de medidas</div><div class="chart-wrap"><canvas id="chart-medidas"></canvas></div></div>
+  <div class="card"><div class="card-title">Historial</div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Cintura</th><th>Cadera</th><th>Pecho</th><th>Brazo</th><th>Muslo</th><th></th></tr></thead><tbody id="tabla-medidas"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">Sin medidas</td></tr></tbody></table></div></div>
+</div>
+
+<!-- ─── LOG EJERCICIO ─── -->
+<div id="page-ejercicio" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Registrar entrenamiento</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="inp-fecha-ex"></div>
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="inp-tipo-ex"><option>Gimnasio — Pierna</option><option>Gimnasio — Pecho/Tríceps</option><option>Gimnasio — Espalda/Bíceps</option><option>Cardio — Caminar</option><option>Cardio — Correr</option><option>Cardio — Caminar + Correr</option><option>Descanso activo</option><option>Otro</option></select></div>
+      <div class="form-group"><label class="form-label">Duración (min)</label><input class="form-input" type="number" id="inp-duracion" placeholder="60"></div>
+      <div class="form-group"><label class="form-label">Intensidad</label><select class="form-input" id="inp-intensidad"><option>Baja</option><option selected>Moderada</option><option>Alta</option></select></div>
+      <div class="form-group"><label class="form-label">Calorías (aprox)</label><input class="form-input" type="number" id="inp-kcal-ex" placeholder="400"></div>
+      <div class="form-group"><label class="form-label">Distancia km</label><input class="form-input" type="number" id="inp-dist" step="0.1" placeholder="3.5"></div>
+    </div>
+    <div class="form-group" style="margin-top:10px"><label class="form-label">Nota</label><input class="form-input" type="text" id="inp-nota-ex" placeholder="ej. aumenté peso en sentadilla..."></div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="guardarEjercicio()">Guardar entrenamiento</button></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">Resumen total</div>
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr">
+        <div class="stat-card" style="padding:13px"><div class="stat-label">Sesiones</div><div class="stat-value" style="font-size:22px" id="ex-total">0</div></div>
+        <div class="stat-card" style="padding:13px"><div class="stat-label">Minutos</div><div class="stat-value" style="font-size:22px" id="ex-min">0</div></div>
+        <div class="stat-card" style="padding:13px"><div class="stat-label">Calorías</div><div class="stat-value" style="font-size:22px" id="ex-kcal">0</div></div>
+        <div class="stat-card" style="padding:13px"><div class="stat-label">km cardio</div><div class="stat-value" style="font-size:22px" id="ex-km">0</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Tipos de entrenamiento</div><div class="chart-wrap" style="height:180px"><canvas id="chart-tipos"></canvas></div></div>
+  </div>
+  <div class="card"><div class="card-title">Historial</div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Duración</th><th>Intensidad</th><th>Calorías</th><th>Nota</th><th></th></tr></thead><tbody id="tabla-ejercicio"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">Sin entrenamientos</td></tr></tbody></table></div></div>
+</div>
+
+<!-- ─── NUTRICION ─── -->
+<div id="page-nutricion" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Registrar nutrición diaria</div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" type="date" id="inp-fecha-nut"></div>
+      <div class="form-group"><label class="form-label">Calorías</label><input class="form-input" type="number" id="inp-kcal-nut" placeholder="1800"></div>
+      <div class="form-group"><label class="form-label">Proteína (g)</label><input class="form-input" type="number" id="inp-prot" placeholder="155"></div>
+      <div class="form-group"><label class="form-label">Carbs (g)</label><input class="form-input" type="number" id="inp-carbs" placeholder="180"></div>
+      <div class="form-group"><label class="form-label">Grasas (g)</label><input class="form-input" type="number" id="inp-grasas" placeholder="55"></div>
+      <div class="form-group"><label class="form-label">Agua (L)</label><input class="form-input" type="number" id="inp-agua" step="0.1" placeholder="2.5"></div>
+    </div>
+    <div class="form-group" style="margin-top:10px"><label class="form-label">Nota</label><input class="form-input" type="text" id="inp-nota-nut" placeholder="ej. seguí el plan..."></div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="guardarNutricion()">Guardar</button></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="card-title">Calorías — Últimas 2 semanas</div><div class="chart-wrap"><canvas id="chart-kcal"></canvas></div></div>
+  <div class="card"><div class="card-title">Historial nutricional</div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Calorías</th><th>Proteína</th><th>Carbs</th><th>Grasas</th><th>Agua</th><th>Nota</th></tr></thead><tbody id="tabla-nutricion"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">Sin registros</td></tr></tbody></table></div></div>
+</div>
+
+<!-- ─── RUTINA ─── -->
+<div id="page-rutina" class="page" style="padding:0">
+  <div class="r-hero">
+    <div class="r-hero-bg">FIT</div>
+    <div class="r-hero-inner">
+      <div class="r-hero-tag">Programa personalizado 12 semanas</div>
+      <div class="r-hero-title">RUTINA<br><span>SEMANAL</span></div>
+      <div class="r-hero-sub">Diseñado para ti: hombre &lt;30 años, punto de partida sedentario. Combina gimnasio completo + cardio progresivo. Cada ejercicio con video de técnica en YouTube.</div>
+      <div class="r-hero-pills">
+        <div class="r-pill">⚖️ 120 → 80 kg</div>
+        <div class="r-pill">🏋️ 3 días gimnasio</div>
+        <div class="r-pill">🏃 3 días cardio</div>
+        <div class="r-pill">😴 1 día descanso</div>
+      </div>
+    </div>
+  </div>
+  <div class="r-container">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px">Fase de entrenamiento</div>
+    <div class="week-nav" id="week-nav"></div>
+    <div class="week-summary">
+      <div class="ws-card"><div class="ws-val" style="color:var(--orange)">3</div><div class="ws-label">Días Gym</div></div>
+      <div class="ws-card"><div class="ws-val" style="color:var(--amber)" id="ws-cardio">3</div><div class="ws-label">Días Cardio</div></div>
+      <div class="ws-card"><div class="ws-val" style="color:var(--blue)" id="ws-min">225</div><div class="ws-label">Min totales</div></div>
+      <div class="ws-card"><div class="ws-val" style="color:var(--accent)" id="ws-kcal">~1400</div><div class="ws-label">Kcal quemadas</div></div>
+    </div>
+    <div class="day-tabs" id="day-tabs"></div>
+    <div id="workout-content"></div>
+  </div>
+</div>
+
+<!-- ─── PLAN COMIDA ─── -->
+<div id="page-plan_comida" class="page">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Plan alimentario semanal — 1800 kcal/día</div>
+    <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
+      <div class="stat-card" style="padding:13px"><div class="stat-label">Calorías</div><div class="stat-value" style="font-size:20px;color:var(--accent)">1800</div><div class="stat-sub">kcal / día</div></div>
+      <div class="stat-card" style="padding:13px"><div class="stat-label">Proteína</div><div class="stat-value" style="font-size:20px;color:var(--blue)">155g</div><div class="stat-sub">34%</div></div>
+      <div class="stat-card" style="padding:13px"><div class="stat-label">Carbohidratos</div><div class="stat-value" style="font-size:20px;color:var(--amber)">180g</div><div class="stat-sub">40%</div></div>
+      <div class="stat-card" style="padding:13px"><div class="stat-label">Grasas</div><div class="stat-value" style="font-size:20px;color:var(--orange)">55g</div><div class="stat-sub">27%</div></div>
+      <div class="stat-card" style="padding:13px"><div class="stat-label">Agua</div><div class="stat-value" style="font-size:20px;color:var(--purple)">2.5L</div><div class="stat-sub">mínimo</div></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="meal-day-tabs"></div>
+  <div id="meal-content"></div>
+</div>
+
+<!-- ─── LOGROS ─── -->
+<div id="page-logros" class="page">
+  <div class="section-label">Hitos de peso</div>
+  <div class="medals-grid" id="medals-peso"></div>
+  <div class="section-label" style="margin-top:20px">Hitos de ejercicio</div>
+  <div class="medals-grid" id="medals-ex"></div>
+  <div class="section-label" style="margin-top:20px">Línea de tiempo</div>
+  <div class="card"><div class="timeline" id="timeline-logros"><div class="empty"><div class="empty-icon">🏆</div><div class="empty-text">¡Registra tu primer pesaje para desbloquear logros!</div></div></div></div>
+</div>
+
+<!-- ─── RECETAS ─── -->
+<div id="page-recetas" class="page">
+
+  <!-- HERO -->
+  <div style="background:linear-gradient(135deg,rgba(255,107,43,0.07) 0%,rgba(251,191,36,0.05) 100%);border:1px solid rgba(255,107,43,0.14);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Cocina inteligente — Plan 1800 kcal</div>
+    <div style="font-family:var(--font-head);font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px">Recetas & Consejos de Cocina</div>
+    <div style="font-size:13px;color:var(--muted)">Todas las recetas usan los ingredientes de tu plan semanal. Rápidas, sencillas y con macros calculados.</div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 16px;text-align:center"><div style="font-family:var(--font-head);font-size:20px;color:var(--orange)">18</div><div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">recetas</div></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 16px;text-align:center"><div style="font-family:var(--font-head);font-size:20px;color:var(--amber)">≤20</div><div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">min prep</div></div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 16px;text-align:center"><div style="font-family:var(--font-head);font-size:20px;color:var(--accent)">Alta</div><div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">proteína</div></div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px" id="rec-filter-tabs"></div>
+
+  <!-- RECIPE GRID -->
+  <div id="rec-grid"></div>
+
+  <!-- MODAL DETALLE -->
+  <div id="rec-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeRecModal(event)">
+    <div id="rec-modal-box" style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
+      <button onclick="closeRecModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
+      <div id="rec-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- CONSEJOS DE COCINA -->
+  <div class="section-label" style="margin-top:28px">Técnicas y consejos esenciales</div>
+  <div id="rec-tips-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div>
+
+  <!-- MEAL PREP -->
+  <div class="section-label" style="margin-top:24px">Meal Prep dominical — 1 hora, toda la semana lista</div>
+  <div id="rec-prep-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"></div>
+
+</div>
+
+<!-- ─── COMPRAS ─── -->
+<div id="page-compras" class="page">
+
+  <!-- HERO BANNER -->
+  <div style="background:linear-gradient(135deg,rgba(110,231,183,0.08) 0%,rgba(96,165,250,0.06) 100%);border:1px solid rgba(110,231,183,0.15);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Lista de Compras — Plan Nutricional</div>
+      <div style="font-family:var(--font-head);font-size:24px;font-weight:700;letter-spacing:-0.02em">Supermercado Semanal</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">Basado en tu plan de 1800 kcal · 155g proteína · 7 días</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div style="text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px">
+        <div style="font-family:var(--font-head);font-size:22px;color:var(--accent)" id="shop-total-items">0</div>
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">items</div>
+      </div>
+      <div style="text-align:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px">
+        <div style="font-family:var(--font-head);font-size:22px;color:var(--accent)" id="shop-done-items">0</div>
+        <div style="font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">comprados</div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetCompras()" style="font-size:12px">↺ Reiniciar</button>
+      <button class="btn btn-primary" onclick="printCompras()" style="font-size:12px">🖨 Imprimir</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12.5px;color:var(--muted)">Progreso de compra</span><span style="font-size:12.5px;font-weight:600" id="shop-pct-txt">0%</span></div>
+    <div style="height:7px;background:var(--bg3);border-radius:4px;overflow:hidden"><div id="shop-pct-bar" style="height:100%;border-radius:4px;background:var(--accent);width:0%;transition:width 0.4s ease"></div></div>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px" id="shop-cat-tabs"></div>
+
+  <!-- ITEMS GRID -->
+  <div id="shop-items-container"></div>
+
+  <!-- TIPS SECTION -->
+  <div style="margin-top:24px">
+    <div class="section-label">Consejos de compra inteligente</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="shop-tips-grid"></div>
+  </div>
+
+</div>
+
+</main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-rapido">
+  <div class="modal">
+    <div class="modal-title">Registro rápido del día</div>
+    <div class="form-group" style="margin-bottom:12px"><label class="form-label">Fecha</label><input class="form-input" type="date" id="m-fecha"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" type="number" id="m-peso" step="0.1" placeholder="120.0"></div>
+      <div class="form-group"><label class="form-label">Entrenamiento</label><select class="form-input" id="m-ex"><option value="">— ninguno —</option><option>Gimnasio</option><option>Cardio</option><option>Descanso activo</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Nota del día</label><input class="form-input" type="text" id="m-nota" placeholder="¿Cómo te sentiste hoy?"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('rapido')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarRapido()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
