@@ -1,12 +1,42 @@
 // ════════════════════════════════════════
-// DATA & STORAGE
+// DATA & STORAGE (CSV backend via Flask)
 // ════════════════════════════════════════
-const KEY = 'fittracker_v4';
-let D = JSON.parse(localStorage.getItem(KEY)||'null') || {
+let D = {
   perfil:{pesoInicial:120,pesoMeta:80,altura:1.80},
   pesos:[], medidas:[], ejercicios:[], nutricion:[]
 };
-function save(){localStorage.setItem(KEY,JSON.stringify(D));}
+
+function coerceNum(v){const n=parseFloat(v);return isNaN(n)?null:n;}
+
+async function loadData(){
+  const r = await fetch('/api/data');
+  const raw = await r.json();
+  D.pesos = (raw.pesos||[]).map(p=>({...p, peso:coerceNum(p.peso), bmi:coerceNum(p.bmi)}));
+  D.medidas = (raw.medidas||[]).map(m=>({
+    fecha:m.fecha,
+    cintura:coerceNum(m.cintura), cadera:coerceNum(m.cadera),
+    pecho:coerceNum(m.pecho), brazo:coerceNum(m.brazo), muslo:coerceNum(m.muslo)
+  }));
+  D.ejercicios = (raw.ejercicios||[]).map(e=>({
+    ...e,
+    duracion:coerceNum(e.duracion)||0, calorias:coerceNum(e.calorias)||0,
+    distancia:coerceNum(e.distancia)||0
+  }));
+  D.nutricion = (raw.nutricion||[]).map(n=>({
+    ...n,
+    kcal:coerceNum(n.kcal)||0, proteina:coerceNum(n.proteina)||0,
+    carbs:coerceNum(n.carbs)||0, grasas:coerceNum(n.grasas)||0, agua:coerceNum(n.agua)||0
+  }));
+}
+
+async function apiAdd(table, row){
+  await fetch('/api/'+table, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(row)});
+  await loadData();
+}
+async function apiDel(table, idx){
+  await fetch('/api/'+table+'/'+idx, {method:'DELETE'});
+  await loadData();
+}
 
 // ════════════════════════════════════════
 // UTILS
@@ -43,43 +73,41 @@ function closeModal(id){document.getElementById('modal-'+id).classList.remove('o
 // ════════════════════════════════════════
 // SAVE FUNCTIONS
 // ════════════════════════════════════════
-function guardarPeso(){
+async function guardarPeso(){
   const p=parseFloat(document.getElementById('inp-peso').value);
   if(!p||p<30||p>300){toast('⚠ Ingresa un peso válido');return;}
-  D.pesos.push({fecha:document.getElementById('inp-fecha-peso').value,peso:p,momento:document.getElementById('inp-momento').value,nota:document.getElementById('inp-nota-peso').value,bmi:+bmi(p)});
-  D.pesos.sort((a,b)=>a.fecha.localeCompare(b.fecha));
-  save();document.getElementById('inp-peso').value='';document.getElementById('inp-nota-peso').value='';
+  await apiAdd('pesos',{fecha:document.getElementById('inp-fecha-peso').value,peso:p,momento:document.getElementById('inp-momento').value,nota:document.getElementById('inp-nota-peso').value,bmi:+bmi(p)});
+  document.getElementById('inp-peso').value='';document.getElementById('inp-nota-peso').value='';
   toast('✓ Pesaje guardado: '+p+' kg');renderPeso();renderDashboard();
 }
-function guardarMedidas(){
+async function guardarMedidas(){
   const e={fecha:document.getElementById('inp-fecha-med').value,cintura:+document.getElementById('inp-cintura').value||null,cadera:+document.getElementById('inp-cadera').value||null,pecho:+document.getElementById('inp-pecho').value||null,brazo:+document.getElementById('inp-brazo').value||null,muslo:+document.getElementById('inp-muslo').value||null};
   if(!e.cintura&&!e.cadera&&!e.pecho){toast('⚠ Ingresa al menos una medida');return;}
-  D.medidas.push(e);D.medidas.sort((a,b)=>a.fecha.localeCompare(b.fecha));save();toast('✓ Medidas guardadas');renderMedidas();
+  await apiAdd('medidas',e);toast('✓ Medidas guardadas');renderMedidas();
 }
-function guardarEjercicio(){
-  D.ejercicios.push({fecha:document.getElementById('inp-fecha-ex').value,tipo:document.getElementById('inp-tipo-ex').value,duracion:+document.getElementById('inp-duracion').value||0,intensidad:document.getElementById('inp-intensidad').value,calorias:+document.getElementById('inp-kcal-ex').value||0,distancia:+document.getElementById('inp-dist').value||0,nota:document.getElementById('inp-nota-ex').value});
-  D.ejercicios.sort((a,b)=>a.fecha.localeCompare(b.fecha));save();
+async function guardarEjercicio(){
+  await apiAdd('ejercicios',{fecha:document.getElementById('inp-fecha-ex').value,tipo:document.getElementById('inp-tipo-ex').value,duracion:+document.getElementById('inp-duracion').value||0,intensidad:document.getElementById('inp-intensidad').value,calorias:+document.getElementById('inp-kcal-ex').value||0,distancia:+document.getElementById('inp-dist').value||0,nota:document.getElementById('inp-nota-ex').value});
   document.getElementById('inp-nota-ex').value='';document.getElementById('inp-kcal-ex').value='';document.getElementById('inp-dist').value='';
   toast('✓ Entrenamiento registrado');renderEjercicio();renderDashboard();
 }
-function guardarNutricion(){
+async function guardarNutricion(){
   const k=+document.getElementById('inp-kcal-nut').value;
   if(!k){toast('⚠ Ingresa las calorías');return;}
-  D.nutricion.push({fecha:document.getElementById('inp-fecha-nut').value,kcal:k,proteina:+document.getElementById('inp-prot').value||0,carbs:+document.getElementById('inp-carbs').value||0,grasas:+document.getElementById('inp-grasas').value||0,agua:+document.getElementById('inp-agua').value||0,nota:document.getElementById('inp-nota-nut').value});
-  D.nutricion.sort((a,b)=>a.fecha.localeCompare(b.fecha));save();toast('✓ Nutrición guardada');renderNutricion();
+  await apiAdd('nutricion',{fecha:document.getElementById('inp-fecha-nut').value,kcal:k,proteina:+document.getElementById('inp-prot').value||0,carbs:+document.getElementById('inp-carbs').value||0,grasas:+document.getElementById('inp-grasas').value||0,agua:+document.getElementById('inp-agua').value||0,nota:document.getElementById('inp-nota-nut').value});
+  toast('✓ Nutrición guardada');renderNutricion();
 }
-function guardarRapido(){
+async function guardarRapido(){
   const fecha=document.getElementById('m-fecha').value;
   const p=parseFloat(document.getElementById('m-peso').value);
   const ex=document.getElementById('m-ex').value;
   const nota=document.getElementById('m-nota').value;
-  if(p&&p>30){D.pesos.push({fecha,peso:p,momento:'Mañana (en ayunas)',nota,bmi:+bmi(p)});D.pesos.sort((a,b)=>a.fecha.localeCompare(b.fecha));}
-  if(ex){D.ejercicios.push({fecha,tipo:ex,duracion:0,intensidad:'Moderada',calorias:0,distancia:0,nota});D.ejercicios.sort((a,b)=>a.fecha.localeCompare(b.fecha));}
-  save();closeModal('rapido');toast('✓ Registro guardado');renderDashboard();
+  if(p&&p>30){await apiAdd('pesos',{fecha,peso:p,momento:'Mañana (en ayunas)',nota,bmi:+bmi(p)});}
+  if(ex){await apiAdd('ejercicios',{fecha,tipo:ex,duracion:0,intensidad:'Moderada',calorias:0,distancia:0,nota});}
+  closeModal('rapido');toast('✓ Registro guardado');renderDashboard();
 }
-function eliminarPeso(i){if(!confirm('¿Eliminar?'))return;D.pesos.splice(i,1);save();renderPeso();renderDashboard();}
-function eliminarMedida(i){if(!confirm('¿Eliminar?'))return;D.medidas.splice(i,1);save();renderMedidas();}
-function eliminarEjercicio(i){if(!confirm('¿Eliminar?'))return;D.ejercicios.splice(i,1);save();renderEjercicio();renderDashboard();}
+async function eliminarPeso(i){if(!confirm('¿Eliminar?'))return;await apiDel('pesos',i);renderPeso();renderDashboard();}
+async function eliminarMedida(i){if(!confirm('¿Eliminar?'))return;await apiDel('medidas',i);renderMedidas();}
+async function eliminarEjercicio(i){if(!confirm('¿Eliminar?'))return;await apiDel('ejercicios',i);renderEjercicio();renderDashboard();}
 
 // ════════════════════════════════════════
 // CHARTS
@@ -917,9 +945,10 @@ function renderMealPrep(){
 // ════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════
-function init(){
+async function init(){
   setDateInputs();
   document.getElementById('page-date').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  await loadData();
   renderDashboard();
   renderShopTipsGrid();
 }
