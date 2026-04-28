@@ -354,6 +354,14 @@
   </div>
 </div>
 
+<!-- EXERCISE DEEP-ANALYSIS MODAL -->
+<div id="ex-modal-overlay" class="ex-modal-overlay" onclick="closeExModal(event)">
+  <div class="ex-modal-box" onclick="event.stopPropagation()">
+    <button class="ex-modal-close" onclick="closeExModal()">✕ Cerrar</button>
+    <div id="ex-modal-content"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="app.js"></script>

@@ -268,9 +268,181 @@ function renderWorkout(){
     h+=`<div class="cardio-block"><div class="cardio-title">🏃 Estructura del entrenamiento</div><div class="cardio-phases">${d.phases_cardio.map(cp=>`<div class="cardio-phase"><div class="cp-label">${cp.label}</div><div class="cp-val">${cp.val}</div><div class="cp-desc" style="white-space:pre-line">${cp.desc}</div></div>`).join('')}</div><div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><a href="${ytL(d.ytLink)}" target="_blank" class="btn-yt">${YT} Ver tutorial en YouTube</a><span style="font-size:12px;color:var(--muted);font-style:italic">${d.tip}</span></div></div><div class="tips-bar"><div class="tip-item"><div class="tip-dot" style="background:var(--amber)"></div><strong style="color:var(--text)">Fase ${ph.name}:</strong></div><div class="tip-item"><div class="tip-dot" style="background:var(--orange)"></div>${ph.label} · ${ph.cardioMin} min activo</div><div class="tip-item"><div class="tip-dot" style="background:var(--accent)"></div>~${ph.cardioKcal} kcal/sesión</div></div>`;
   }
   if(d.exercises){
-    h+=`<div class="exercise-grid">${d.exercises.map((ex,i)=>`<div class="ex-card ${ex.cat}"><div class="ex-num">EJERCICIO ${i+1} · ${ex.cat==='core'?'CORE':ex.cat==='primary'?'PRINCIPAL':'COMPLEMENTARIO'}</div><div class="ex-name">${ex.name}</div><div class="ex-series"><span class="ex-badge badge-sets">📦 ${ex.sets} series</span><span class="ex-badge badge-reps">🔁 ${ex.reps} reps</span><span class="ex-badge badge-rest">⏸ ${ex.rest}</span></div><div class="ex-tip">${ex.tip}</div><a href="${ytL(ex.yt)}" target="_blank" class="btn-yt">${YT} Ver técnica en YouTube</a></div>`).join('')}</div><div class="tips-bar"><div class="tip-item"><div class="tip-dot" style="background:var(--orange)"></div><strong style="color:var(--text)">Fase ${ph.name}:</strong></div><div class="tip-item"><div class="tip-dot" style="background:var(--blue)"></div>Sem 1-4: técnica con peso ligero</div><div class="tip-item"><div class="tip-dot" style="background:var(--amber)"></div>Sem 5-8: +5-10% de peso</div><div class="tip-item"><div class="tip-dot" style="background:var(--accent)"></div>Sem 9-12: máxima carga</div></div>`;
+    h+=`<div class="exercise-grid">${d.exercises.map((ex,i)=>`<div class="ex-card ${ex.cat}" onclick="openExModal(${i})" style="cursor:pointer"><div class="ex-num">EJERCICIO ${i+1} · ${ex.cat==='core'?'CORE':ex.cat==='primary'?'PRINCIPAL':'COMPLEMENTARIO'}</div><div class="ex-name">${ex.name}</div><div class="ex-series"><span class="ex-badge badge-sets">📦 ${ex.sets} series</span><span class="ex-badge badge-reps">🔁 ${ex.reps} reps</span><span class="ex-badge badge-rest">⏸ ${ex.rest}</span></div><div class="ex-tip">${ex.tip}</div><a href="${ytL(ex.yt)}" target="_blank" class="btn-yt" onclick="event.stopPropagation()">${YT} Ver técnica en YouTube</a><div style="font-size:11px;color:var(--muted2);margin-top:10px;display:flex;align-items:center;gap:5px">🔍 <span>Toca para análisis profundo</span></div></div>`).join('')}</div><div class="tips-bar"><div class="tip-item"><div class="tip-dot" style="background:var(--orange)"></div><strong style="color:var(--text)">Fase ${ph.name}:</strong></div><div class="tip-item"><div class="tip-dot" style="background:var(--blue)"></div>Sem 1-4: técnica con peso ligero</div><div class="tip-item"><div class="tip-dot" style="background:var(--amber)"></div>Sem 5-8: +5-10% de peso</div><div class="tip-item"><div class="tip-dot" style="background:var(--accent)"></div>Sem 9-12: máxima carga</div></div>`;
   }
   el.innerHTML=h;
+}
+
+// ════════════════════════════════════════
+// EXERCISE DEEP-ANALYSIS MODAL
+// ════════════════════════════════════════
+const exErrors = {
+  primary:[
+    'Usar peso excesivo sacrificando la técnica — siempre prioriza la forma',
+    'No respetar la fase excéntrica (la bajada): debe ser controlada (2-3 seg)',
+    'Cortar el rango de movimiento — baja a la profundidad completa',
+    'Tomar descansos demasiado cortos — la fuerza necesita 75-90 seg de recuperación'
+  ],
+  secondary:[
+    'Compensar con otros músculos — aísla el músculo objetivo',
+    'Velocidad descontrolada — el objetivo es la conexión mente-músculo',
+    'No contraer en el punto pico del movimiento (squeeze de 1 seg)',
+    'Usar peso muy alto y perder el rango completo'
+  ],
+  core:[
+    'Aguantar la respiración — exhala en la contracción',
+    'Tensión en cuello/cervicales en lugar del core',
+    'Pelvis en mala posición — mantén neutralidad',
+    'Comprometer el tiempo objetivo — calidad > cantidad'
+  ]
+};
+const exBenefits = {
+  primary:[
+    'Hipertrofia muscular máxima (crecimiento)',
+    'Aumento de fuerza progresiva',
+    'Mejora hormonal: testosterona y hormona de crecimiento',
+    'Quema calórica alta durante y post-entrenamiento (EPOC)'
+  ],
+  secondary:[
+    'Definición y simetría muscular',
+    'Estabilización de articulaciones',
+    'Trabajo de músculos sinergistas y estabilizadores',
+    'Reducción de riesgo de lesión'
+  ],
+  core:[
+    'Estabilidad postural global',
+    'Reducción significativa del dolor lumbar',
+    'Mejor transferencia de fuerza en otros ejercicios',
+    'Definición abdominal y control corporal'
+  ]
+};
+const exTechniqueExtra = {
+  primary:[
+    'Calienta con 1-2 series ligeras antes de las series de trabajo',
+    'Inhala al bajar (fase excéntrica), exhala al subir (concéntrica)',
+    'Fija el core durante todo el movimiento para proteger la columna',
+    'Mantén el patrón de respiración constante; nunca aguantes la respiración bajo carga'
+  ],
+  secondary:[
+    'Establece la conexión mente-músculo: siente el músculo trabajando',
+    'Pausa 1 segundo en el punto de máxima contracción',
+    'Controla la fase excéntrica (2-3 seg de bajada)',
+    'Mantén tensión constante; no relajes en los extremos'
+  ],
+  core:[
+    'Activa el core "aspirando" el ombligo hacia la columna',
+    'Mantén respiración fluida durante todo el ejercicio',
+    'Calidad sobre velocidad: prefiere menos tiempo bien hecho',
+    'Si pierdes la forma, descansa antes de continuar'
+  ]
+};
+const catLabels = {primary:'PRINCIPAL', secondary:'COMPLEMENTARIO', core:'CORE'};
+const catColors = {primary:'var(--orange)', secondary:'var(--blue)', core:'var(--accent)'};
+
+function openExModal(i){
+  const day = rutinaData[curDay];
+  const ex = day.exercises[i];
+  const ph = phases[curPhase];
+
+  // volume math
+  const setsN = +ex.sets || 0;
+  const repsN = parseInt(ex.reps) || 0;
+  const isTimed = String(ex.reps).toLowerCase().includes('seg');
+  const totalReps = isTimed ? null : setsN * repsN;
+  const restSec = parseInt(ex.rest) || 0;
+  const setSec = isTimed ? repsN : Math.max(20, repsN * 3); // ~3 sec/rep o seg directos
+  const totalSec = (setsN * setSec) + (Math.max(0, setsN - 1) * restSec);
+  const totalMin = Math.round(totalSec / 60);
+
+  const errors = exErrors[ex.cat] || exErrors.primary;
+  const benefits = exBenefits[ex.cat] || exBenefits.primary;
+  const techExtra = exTechniqueExtra[ex.cat] || exTechniqueExtra.primary;
+  const catLabel = catLabels[ex.cat] || ex.cat.toUpperCase();
+  const catColor = catColors[ex.cat] || 'var(--accent)';
+
+  const muscles = (day.muscles_p||[]).concat(day.muscles_s||[]);
+
+  let html = `
+    <div class="ex-modal-hero cat-${ex.cat}">
+      <div class="ex-modal-num">EJERCICIO ${i+1} · <span style="color:${catColor}">${catLabel}</span></div>
+      <div class="ex-modal-name">${ex.name}</div>
+      <div class="ex-modal-meta">
+        <span class="muscle-tag mt-primary">${day.title}</span>
+        <span class="meta-chip">${day.icon} ${day.name}</span>
+        <span class="meta-chip">📅 Fase: ${ph.name}</span>
+      </div>
+    </div>
+    <div class="ex-modal-body">
+      <div class="ex-stats-grid">
+        <div class="ex-stat"><div class="ex-stat-val" style="color:var(--orange)">${ex.sets}</div><div class="ex-stat-label">Series</div></div>
+        <div class="ex-stat"><div class="ex-stat-val" style="color:var(--blue)">${ex.reps}</div><div class="ex-stat-label">${isTimed?'Tiempo':'Reps'}</div></div>
+        <div class="ex-stat"><div class="ex-stat-val" style="color:var(--green)">${ex.rest}</div><div class="ex-stat-label">Descanso</div></div>
+        <div class="ex-stat"><div class="ex-stat-val" style="color:var(--accent)">~${totalMin} min</div><div class="ex-stat-label">Duración total</div></div>
+      </div>
+
+      ${totalReps?`<div class="ex-section"><div class="ex-section-title" style="color:${catColor}">Volumen total estimado</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="ex-badge badge-sets" style="font-size:13px;padding:7px 14px">${totalReps} reps totales</span>
+          <span class="ex-badge badge-reps" style="font-size:13px;padding:7px 14px">${setsN} × ${repsN}</span>
+          <span class="ex-badge badge-rest" style="font-size:13px;padding:7px 14px">${Math.round(totalSec/60*10)/10} min activos</span>
+        </div></div>`:''}
+
+      <div class="ex-section">
+        <div class="ex-section-title" style="color:${catColor}">Técnica clave</div>
+        <div class="ex-bullet-list">
+          <div class="ex-bullet step"><span class="ex-bullet-mark">★</span><span><strong>Tip principal:</strong> ${ex.tip}</span></div>
+          ${techExtra.map((t,k)=>`<div class="ex-bullet step"><span class="ex-bullet-mark">${k+1}</span><span>${t}</span></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="ex-section">
+        <div class="ex-section-title" style="color:var(--accent)">Beneficios</div>
+        <div class="ex-bullet-list">
+          ${benefits.map(b=>`<div class="ex-bullet good"><span class="ex-bullet-mark">✓</span><span>${b}</span></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="ex-section">
+        <div class="ex-section-title" style="color:var(--red)">Errores comunes a evitar</div>
+        <div class="ex-bullet-list">
+          ${errors.map(e=>`<div class="ex-bullet bad"><span class="ex-bullet-mark">✕</span><span>${e}</span></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="ex-section">
+        <div class="ex-section-title" style="color:${catColor}">Progresión 12 semanas</div>
+        <div class="ex-progression">
+          ${phases.map((p,k)=>`<div class="ex-prog-card ${k===curPhase?'active':''}">
+            <div class="ex-prog-label">${p.label}</div>
+            <div class="ex-prog-name">${p.name}</div>
+            <div class="ex-prog-desc">${k===0?'Aprende la técnica con peso ligero. Prioriza forma sobre carga.':k===1?'Aumenta el peso 5-10% manteniendo las reps. Ya dominas el patrón.':'Carga máxima dentro del rango. Cierra ciclos y testea 1RM.'}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      ${muscles.length?`<div class="ex-section">
+        <div class="ex-section-title" style="color:var(--purple)">Músculos involucrados</div>
+        <div class="muscle-tags">
+          ${(day.muscles_p||[]).map(m=>`<span class="muscle-tag mt-primary">${m}</span>`).join('')}
+          ${(day.muscles_s||[]).map(m=>`<span class="muscle-tag mt-secondary">${m}</span>`).join('')}
+        </div>
+      </div>`:''}
+
+      <div class="ex-cta">
+        <a href="${ytL(ex.yt)}" target="_blank" class="btn-yt" style="font-size:13px;padding:10px 18px">${YT} Ver técnica en YouTube</a>
+        <button class="btn btn-ghost" onclick="closeExModal()">Cerrar análisis</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('ex-modal-content').innerHTML = html;
+  document.getElementById('ex-modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExModal(e){
+  if(e && e.target && e.target.id !== 'ex-modal-overlay' && e.type === 'click') return;
+  document.getElementById('ex-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 // ════════════════════════════════════════
