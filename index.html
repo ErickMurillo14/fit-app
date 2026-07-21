@@ -40,10 +40,16 @@
   </div>
 </aside>
 
+<!-- Backdrop del menú en móvil -->
+<div class="sidebar-backdrop" onclick="closeSidebar()"></div>
+
 <!-- ══════════════ MAIN ══════════════ -->
 <main class="main">
 <div class="topbar">
-  <div><div class="topbar-title" id="page-title">Dashboard</div><div class="topbar-date" id="page-date"></div></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+    <div><div class="topbar-title" id="page-title">Dashboard</div><div class="topbar-date" id="page-date"></div></div>
+  </div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-ghost" onclick="showPage('rutina',null)">Ver Rutina</button>
     <button class="btn btn-primary" onclick="openModal('rapido')">+ Registro Rápido</button>
@@ -227,6 +233,11 @@
 
 <!-- ─── PLAN COMIDA ─── -->
 <div id="page-plan_comida" class="page">
+  <div style="background:linear-gradient(120deg,rgba(6,6,6,0.92) 0%,rgba(6,6,6,0.72) 45%,rgba(6,6,6,0.3) 100%),url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&h=320&fit=crop&q=80') center/cover no-repeat;border:1px solid rgba(255,122,61,0.14);border-radius:var(--radius);padding:28px 24px;margin-bottom:16px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Nutrición — Plan 1800 kcal</div>
+    <div style="font-family:var(--font-head);font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px">Plan de Comida Semanal</div>
+    <div style="font-size:13px;color:var(--muted);max-width:520px">Toca cualquier comida para ver sus ingredientes y los pasos de preparación.</div>
+  </div>
   <div class="card" style="margin-bottom:14px">
     <div class="card-title">Plan alimentario semanal — 1800 kcal/día</div>
     <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
@@ -239,6 +250,14 @@
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="meal-day-tabs"></div>
   <div id="meal-content"></div>
+
+  <!-- MODAL RECETA/PASOS DE COMIDA -->
+  <div id="meal-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeMealModal(event)">
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
+      <button onclick="closeMealModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
+      <div id="meal-modal-content"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ─── LOGROS ─── -->
@@ -255,7 +274,7 @@
 <div id="page-recetas" class="page">
 
   <!-- HERO -->
-  <div style="background:linear-gradient(135deg,rgba(255,107,43,0.07) 0%,rgba(251,191,36,0.05) 100%);border:1px solid rgba(255,107,43,0.14);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px">
+  <div style="background:linear-gradient(120deg,rgba(6,6,6,0.93) 0%,rgba(6,6,6,0.78) 45%,rgba(6,6,6,0.35) 100%),url('https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=1200&h=320&fit=crop&q=80') center/cover no-repeat;border:1px solid rgba(255,107,43,0.14);border-radius:var(--radius);padding:28px 24px;margin-bottom:20px">
     <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">Cocina inteligente — Plan 1800 kcal</div>
     <div style="font-family:var(--font-head);font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px">Recetas & Consejos de Cocina</div>
     <div style="font-size:13px;color:var(--muted)">Todas las recetas usan los ingredientes de tu plan semanal. Rápidas, sencillas y con macros calculados.</div>
@@ -294,7 +313,7 @@
 <div id="page-compras" class="page">
 
   <!-- HERO BANNER -->
-  <div style="background:linear-gradient(135deg,rgba(110,231,183,0.08) 0%,rgba(96,165,250,0.06) 100%);border:1px solid rgba(110,231,183,0.15);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
+  <div style="background:linear-gradient(120deg,rgba(6,6,6,0.93) 0%,rgba(6,6,6,0.76) 45%,rgba(6,6,6,0.35) 100%),url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&h=320&fit=crop&q=80') center/cover no-repeat;border:1px solid rgba(255,122,61,0.18);border-radius:var(--radius);padding:28px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px">
     <div>
       <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Lista de Compras — Plan Nutricional</div>
       <div style="font-family:var(--font-head);font-size:24px;font-weight:700;letter-spacing:-0.02em">Supermercado Semanal</div>

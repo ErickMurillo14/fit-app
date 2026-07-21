@@ -2,3 +2,11 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Base de datos y datos locales (se crean solos al arrancar; no se versionan)
+data/
+*.db
+*.sqlite3
+
+# Configuración local del entorno de desarrollo
+.claude/
