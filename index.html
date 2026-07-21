@@ -250,14 +250,6 @@
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="meal-day-tabs"></div>
   <div id="meal-content"></div>
-
-  <!-- MODAL RECETA/PASOS DE COMIDA -->
-  <div id="meal-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeMealModal(event)">
-    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
-      <button onclick="closeMealModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
-      <div id="meal-modal-content"></div>
-    </div>
-  </div>
 </div>
 
 <!-- ─── LOGROS ─── -->
@@ -290,14 +282,6 @@
 
   <!-- RECIPE GRID -->
   <div id="rec-grid"></div>
-
-  <!-- MODAL DETALLE -->
-  <div id="rec-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeRecModal(event)">
-    <div id="rec-modal-box" style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
-      <button onclick="closeRecModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
-      <div id="rec-modal-content"></div>
-    </div>
-  </div>
 
   <!-- CONSEJOS DE COCINA -->
   <div class="section-label" style="margin-top:28px">Técnicas y consejos esenciales</div>
@@ -378,6 +362,22 @@
   <div class="ex-modal-box" onclick="event.stopPropagation()">
     <button class="ex-modal-close" onclick="closeExModal()">✕ Cerrar</button>
     <div id="ex-modal-content"></div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE DE RECETA (a nivel de body para que position:fixed funcione) -->
+<div id="rec-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeRecModal(event)">
+  <div id="rec-modal-box" style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
+    <button onclick="closeRecModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
+    <div id="rec-modal-content"></div>
+  </div>
+</div>
+
+<!-- MODAL RECETA/PASOS DE COMIDA (a nivel de body) -->
+<div id="meal-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:300;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto" onclick="closeMealModal(event)">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:600px;padding:28px;position:relative" onclick="event.stopPropagation()">
+    <button onclick="closeMealModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);color:var(--muted);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;font-size:13px">✕ Cerrar</button>
+    <div id="meal-modal-content"></div>
   </div>
 </div>
 
